@@ -1,0 +1,134 @@
+settings
+# Application configuration
+app:
+    # The application name
+    name: musicians
+    # Target framework
+    framework: node
+
+api:
+    # choose one: [rest, graphql]
+    format: rest
+
+end settings
+
+
+# storage spec section
+database mydatabase sqlite3
+
+# datamodel spec section
+
+Model Musician {
+      id          uuid      [primary key]
+      first-name  string    [maxlength 70]
+      last_name   string    [maxlength 40]
+      instrument  string    [choice ["guitar","piano","drums","bass","voice"]]
+      age         integer   [min 0]
+      fans        integer64 [min 0]
+      inspired-at time
+}
+
+Model Album {
+      id           integer [primary key, default auto increment]
+      name         string  [maxlength 80,unique, not null]
+      genre        string  [choice ["rock","pop","folk"]]
+      release_date date    [default now]
+      num_stars    integer [range 0 5]
+      ranking      float   [default 3.0, range 2.0 10.2]
+      upc          string  [maxlength 12]
+}
+
+Model Song {
+      id     integer [primary key]
+      name   string [maxlength 100, not null]
+      lyrics string [maxlength 1000]
+      code   uuid
+}
+
+Model Concert {
+      name    string [maxlength 50, primary key]
+      place   string [max length 200, not null]
+      date    datetime [default now]
+      is-free boolean
+}
+
+# One musician can be the producer of many albums.
+Relation records-producer {
+    many prod-records from Album
+    one  producer from Musician
+    nullable
+}
+
+# Many musicians can participate in many albums as interpreters.
+Relation records-interpreters {
+  many albums       from Album
+  many interpreters from Musician
+}
+
+# Many musicians can participate in many albums as collaborators.
+Relation records-collaborators {
+  many collab-albums from Album
+  many collaborators from Musician
+}
+
+# Each concert has a main musician.
+Relation concerts-main-artist {
+    many main-concerts from Concert
+    one  main-artist   from Musician
+}
+
+# Each concert has a secundary musician.
+Relation concerts-secondary-artist {
+    many secondary-concerts from Concert
+    one secondary-artist from Musician
+    nullable
+}
+
+# A musician can specify another musician as his/her "main influence"
+Relation musician-influence {
+   many influenced-musicians from Musician
+   one  influencer from Musician
+   nullable
+}
+
+# An album contains many songs.
+Relation songs-album {
+    many songs from Song
+    one  album from Album
+#    parent-key name
+}
+
+# A song has one composer
+Relation songs-composer {
+    many composed-songs from Song
+    one  composer from Musician
+}
+
+Relation preferred-song-musician {
+    many song-musician-fans from Musician
+    one  preferred-song from Song
+    nullable
+}
+
+# api spec section
+
+API musician-api {
+    model        Musician
+    actions      CRUD
+}
+
+
+API album-api {
+    model        Album
+    actions      CRUD
+}
+
+API song-api {
+    model        Song
+    actions      CRUD
+}
+
+API concert-api {
+    model        Concert
+    actions      CRUD
+}
