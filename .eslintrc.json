@@ -18,7 +18,7 @@
         "devDependencies": true
       }
     ],
-    "no-unused-vars": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "next" }],
     "import/prefer-default-export": "off"
   },
   "settings": {

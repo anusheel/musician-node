@@ -1,14 +1,14 @@
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from 'http-status';
 import { ValidationError as ExpressValidationError } from 'express-validation';
 import { ValidationError as SequelizeValidationError } from 'sequelize';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import BaseError from 'server/utils/errors/BaseError';
 import { createErrorResponse } from 'server/utils/functions';
 import errors from 'server/utils/constants/errors';
 
 type HandledError = BaseError | ExpressValidationError | SequelizeValidationError | Error;
 
-const errorHandler = (err: HandledError, req: Request, res: Response) => {
+const errorHandler = (err: HandledError, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof BaseError) {
     return res
       .status(err.statusCode)
